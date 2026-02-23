@@ -14,9 +14,9 @@ return new class extends Migration
         Schema::create('equipments', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('usage');
-            $table->unsignedBigInteger('model_no');
-            $table->string('value');
+            $table->string('usage', 1000);
+            $table->string('model_no');
+            $table->double('value');
             $table->string('status');
             $table->timestamps();
         });

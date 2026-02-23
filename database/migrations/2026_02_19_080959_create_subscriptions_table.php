@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('bundles', function (Blueprint $table) {
+        Schema::create('subscriptions', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->dateTime('start_time');
-            $table->time('duration');
-            $table->string('description', 1000);
-            $table->unsignedBigInteger('category_id');
-            
-            $table->foreign('category_id')->references('id')->on('categories');
+            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('bundle_id');
+
+            $table->foreign('user_id')->references('id')->on('users');
+            $table->foreign('bundle_id')->references('id')->on('bundles');
 
             $table->timestamps();
         });
@@ -30,6 +28,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('bundles');
+        Schema::dropIfExists('subscriptions');
     }
 };
