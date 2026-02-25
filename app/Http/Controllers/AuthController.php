@@ -5,8 +5,10 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Role;
 use App\Models\User;
+use App\Notifications\VerifyEmailNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
@@ -45,7 +47,22 @@ class AuthController extends Controller
 
         try{
             $user->save();
-            return response()->json($user);
+
+            $signedUrl = URL::temporarySignedRoute(
+            'verification.verify',
+            now()->addMinutes(60),
+            [
+                'id'=>$user->id,
+                'hash'=>sha1($user->email)
+            ]
+        );
+
+        $user->notify(new VerifyEmailNotification($signedUrl));
+
+        return response()->json([
+            'message'=>'Verification Email resent successfully.'
+        ], 200);
+
         }
 
         catch(\Exception $exception){
@@ -68,6 +85,12 @@ class AuthController extends Controller
             throw ValidationException::withMessages([
             'error'=>'Invalid Credentials'
             ], 401);
+        }
+
+        if(!$user->is_active) {
+            return response()->json([
+                'message'=>'Your Account is Not Active. Please Verify Your Email Address'
+            ], 403);
         }
 
         $token = $user->createToken("auth-token")->plainTextToken;

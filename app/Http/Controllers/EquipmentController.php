@@ -11,10 +11,10 @@ class EquipmentController extends Controller
     public function createEquipment(Request $request) {
         $validated = $request->validate([
             'name'=>'required|string',
-            'usage'=>'required|string',
-            'model_no'=>'required|integer',
-            'value'=>'string',
-            'status'=>'required'
+            'usage'=>'required|string|max:1000',
+            'model_no'=>'required|string|unique:equipment,model_no',
+            'value'=>'required|number',
+            'status'=>'required|string'
         ]);
 
         $equipment = new Equipment();
@@ -67,10 +67,10 @@ class EquipmentController extends Controller
     public function updateEquipment(Request $request, $id) {
         $validated = $request->validate([
             'name'=>'required|string',
-            'usage'=>'required|string',
-            'model_no'=>'required|integer',
-            'value'=>'string',
-            'status'=>'required'
+            'usage'=>'required|string|max:1000',
+            'model_no'=>'required|string|unique:equipment,model_no',
+            'value'=>'required|number',
+            'status'=>'required|string'
         ]);
 
         try{
