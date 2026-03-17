@@ -12,11 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->boolean('is_active')->nullable();
-            $table->string('user_image')->nullable();
-            $table->unsignedBigInteger('role_id');
-
-            $table->foreign('role_id')->references('id')->on('roles');
+            $table->string('phoneNumber')->nullable();
+            $table->string('gymLocation')->nullable();
+            $table->string('gender')->nullable();
+            $table->string('dob')->nullable();
         });
     }
 
@@ -26,13 +25,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropForeign(['role_id']);
-
-            $table->dropColumn([
-                'is_active',
-                'user_image',
-                'role_id'
-            ]);                               
+            $table->dropColumn('phoneNumber');
+            $table->dropColumn('gymLocation');
+            $table->dropColumn('gender');
+            $table->dropColumn('dob');
         });
     }
 };

@@ -8,6 +8,10 @@ use Illuminate\Http\Request;
 
 class RoleController extends Controller
 {
+    public function __construct() {
+        $this->authorizeResource(Role::class, 'role');
+    }
+
     public function createRole(Request $request) {
         $validated = $request->validate([
             'name'=>'required|string|unique:roles,name',
@@ -32,6 +36,8 @@ class RoleController extends Controller
     }
 
     public function readAllRoles() {
+        $this->authorize('viewAny', Role::class);
+
         try{
             $roles = Role::all();
             return response()->json($roles);

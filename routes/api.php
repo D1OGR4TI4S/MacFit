@@ -6,27 +6,34 @@ use App\Http\Controllers\GymController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\EquipmentController;
-use App\Http\Controllers\ResendEmailVerificiationController;
+use App\Http\Controllers\ResendEmailVerificationController;
 use App\Http\Controllers\SubscriptionController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserOtpController;
 use App\Http\Controllers\VerifyEmailController;
 use App\Models\Gym;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
     // Public Routes
+Route::get('/getRoles', [RoleController::class, 'readAllRoles']);
+
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/verify-otp', [UserOtpController::class, 'verifyOtp']);
 
     //Email Verification
 Route::get('/email/verify/{id}/{hash}', [VerifyEmailController::class, 'verify'])
     ->name('verification.verify')
     ->middleware(['signed', 'throttle:6,1']);
 
-Route::post('/email/resend', [ResendEmailVerificiationController::class, 'resend'])
+Route::post('/email/resend', [ResendEmailVerificationController::class, 'resend'])
     ->middleware('throttle:6,1');
 
     // Protected Routes
 Route::middleware('auth:sanctum')->group(function () {
+
+    Route::get('/userInfo', [AuthController::class, 'userInfo']);
 
     Route::post('/logout', [AuthController::class, 'logout']);
 
@@ -71,5 +78,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/getSubscription/{id}', [SubscriptionController::class, 'readSubscription']);
     Route::post('/updateSubscription/{id}', [SubscriptionController::class, 'updateSubscription']);
     Route::delete('/deleteSubscription/{id}', [SubscriptionController::class, 'deleteSubscription']);
+    Route::get('/getUserCharges', [SubscriptionController::class, 'getUserCharges']);
+
+    Route::resource('users', UserController::class);
 
 });

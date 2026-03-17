@@ -15,22 +15,22 @@ class RoleSeeder extends Seeder
     {
         Role::create([
             'name'=>'Admin',
-            'description'=>'This is an administrator.'
+            'description'=>'Administrator with full access to the system.'
         ]);
 
         Role::create([
             'name'=>'Trainer',
-            'description'=>'This is a trainer.'
+            'description'=>'Trainer with access to training related systems.'
         ]);
 
         Role::create([
             'name'=>'User',
-            'description'=>'This is a normal user.'
+            'description'=>'User with access to user general features.'
         ]);
 
         Role::create([
             'name'=>'Staff',
-            'description'=>'This is a staff.'
+            'description'=>'Staff member with access to general features.'
         ]);
     }
 }

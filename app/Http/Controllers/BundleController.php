@@ -12,17 +12,19 @@ class BundleController extends Controller
 {
     public function createBundle(Request $request) {
         $validated = $request->validate([
-            'name'=>'required|string',
+            'name'=>'required|string|unique:bundles,name',
             'start_time'=>'required',
             'duration'=>'required',
-            'description'=>'string|max:1000',
-            'category_id'=>'integer|exists:categories,id'
+            'value'=>'required|integer',
+            'description'=>'required|string|max:1000',
+            'category_id'=>'required|integer|exists:categories,id'
         ]);
 
         $bundle = new Bundle();
         $bundle->name = $validated['name'];
         $bundle->start_time = $validated['start_time'];
         $bundle->duration = $validated['duration'];
+        $bundle->value = $validated['value'];
         $bundle->description = $validated['description'];
         $bundle->category_id = $validated['category_id'];
 
@@ -79,11 +81,12 @@ class BundleController extends Controller
 
     public function updateBundle(Request $request, $id) {
         $validated = $request->validate([
-            'name'=>'required|string',
-            'start_time'=>'required|dateTime',
-            'duration'=>'required|time',
-            'description'=>'string|max:1000',
-            'category_id'=>'integer|exists:categories,id'
+            'name'=>'required|string|unique:bundles,name',
+            'start_time'=>'required',
+            'duration'=>'required',
+            'value'=>'required|integer',
+            'description'=>'required|string|max:1000',
+            'category_id'=>'required|integer|exists:categories,id'
         ]);
 
         try{
@@ -92,6 +95,7 @@ class BundleController extends Controller
             $bundle->name = $validated['name'];
             $bundle->start_time = $validated['start_time'];
             $bundle->duration = $validated['duration'];
+            $bundle->value = $validated['value'];
             $bundle->description = $validated['description'];
             $bundle->category_id = $validated['category_id'];
             $bundle->save();

@@ -10,13 +10,14 @@ class SubscriptionController extends Controller
 {
     public function createSubscription(Request $request) {
         $validated = $request->validate([
-            'user_id'=>' integer|exists:users,id',
-            'bundles_id'=>'integer|exists:bundles,id',
+            'bundle_id'=>'required|integer|exists:bundles,id',
         ]);
 
+        $userId = auth()->user()->id;
+
         $subscription = new Subscription();
-        $subscription->user_id = $validated['user_id'];
-        $subscription->bundles_id = $validated['bundles_id'];
+        $subscription->user_id = $userId;
+        $subscription->bundle_id = $validated['bundle_id'];
 
         try{
             $subscription->save();
@@ -60,15 +61,14 @@ class SubscriptionController extends Controller
 
     public function updateSubscription(Request $request, $id) {
         $validated = $request->validate([
-            'user_id'=>' integer|exists:users,id',
-            'bundles_id'=>'integer|exists:bundles,id',
+            'bundle_id'=>'required|integer|exists:bundles,id',
         ]);
 
         try{
             $subscription = Subscription::findOrFail($id);
 
             $subscription->user_id = $validated['user_id'];
-            $subscription->bundles_id = $validated['bundles_id'];
+            $subscription->bundle_id = $validated['bundle_id'];
             
             $subscription->save();
             return response()->json($subscription);
@@ -95,5 +95,19 @@ class SubscriptionController extends Controller
                 'message'=>$exception->getMessage()
             ]);
         }
+    }
+
+    public function getUserCharges() {
+        $user = auth()->user();
+        $userId = $user->id;
+
+        $userCharge = Subscription::where('user_id', $userId)
+                        ->join('users', 'subscriptions.user_id', '=', 'users.id')
+                        ->join('bundles', 'subscriptions.bundle_id', '=', 'bundles.id')
+                        ->sum('bundles.value');
+        return response()->json([
+            'user'=>$user->name,
+            'total_charge'=>$userCharge,
+        ], 200);
     }
 }

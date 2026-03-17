@@ -3,11 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Mail\OtpMail;
 use App\Models\Role;
 use App\Models\User;
+use App\Models\UserOtp;
 use App\Notifications\VerifyEmailNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\ValidationException;
 
@@ -17,13 +20,19 @@ class AuthController extends Controller
         $validated = $request->validate([
             'name'=>'required|string|max:40',
             'email'=>'required|email|unique:users,email',
-            'password'=>'required|string|min:4|max:15|confirmed',
-            'user_image'=>'nullable|image|mimes:jpeg,png,jpg',
+            'password'=>'required|string|min:4|max:15',
+            'user_image'=>'nullable|string|mimes:jpeg,png,jpg',
+            'role_id'=>'required|integer|exists:roles,id',
+            'phoneNumber'=>'required',
+            'dob'=>'required',
+            'gender'=>'required',
+            'gymLocation'=>'required|'
         ]);
 
         if ($request->role_id) {
             $role_id = $request->role_id;
         }
+
         else {
             $role = Role::where('name', 'User')->first();
             $role_id = $role->id;
@@ -32,8 +41,13 @@ class AuthController extends Controller
         $user = new User();
         $user->name = $validated['name'];
         $user->email = $validated['email'];
-        $user->role_id = $role_id;
+        $user->role_id = $validated['role_id'];
         $user->password = Hash::make($validated['password']);
+        $user->phoneNumber = $validated['phoneNumber'];
+        $user->gender = $validated['gender'];
+        $user->dob = $validated['dob'];
+        $user->gymLocation = $validated['gymLocation'];
+        $user->is_active = true; // To delete later
         
         if ($request->hasFile('user_image')) {
             $filename = $request->file('user_image')->store('users', 'public');
@@ -48,20 +62,25 @@ class AuthController extends Controller
         try{
             $user->save();
 
-            $signedUrl = URL::temporarySignedRoute(
-            'verification.verify',
-            now()->addMinutes(60),
-            [
-                'id'=>$user->id,
-                'hash'=>sha1($user->email)
-            ]
-        );
+        //     $signedUrl = URL::temporarySignedRoute(
+        //     'verification.verify',
+        //     now()->addMinutes(60),
+        //     [
+        //         'id'=>$user->id,
+        //         'hash'=>sha1($user->email)
+        //     ]
+        // );
 
-        $user->notify(new VerifyEmailNotification($signedUrl));
+        // $user->notify(new VerifyEmailNotification($signedUrl));
 
+        $token = $user->createToken("auth-token")->plainTextToken;
         return response()->json([
-            'message'=>'Verification Email resent successfully.'
-        ], 200);
+            'message'=>'Login Successful!',
+            'token'=>$token,
+            'user'=>$user,
+            // 'roles'=>$user->role,
+            // 'abilities'=>$user->abilities()
+        ], 201);
 
         }
 
@@ -93,18 +112,38 @@ class AuthController extends Controller
             ], 403);
         }
 
+        // $otp = rand(100000, 999999);
+        // $expiresAt = now()->addMinutes(5);
+
+        // UserOtp::updateOrCreate([
+        //     'user_id'=>$user->id,
+        //     'otp'=>$otp,
+        //     'expires_at'=>$expiresAt
+        // ]);
+
+        // Mail::to($user->email)->send(new OtpMail($otp));
+
+        // return response()->json([
+        //     'message'=>'OTP sent to your email. Please verify to complete login'
+        // ], 201);
+
         $token = $user->createToken("auth-token")->plainTextToken;
 
         return response()->json([
             'message'=>'Login Successful!',
             'token'=>$token,
             'user'=>$user,
-            'abilities'=>$user->abilities()
+            // 'roles'=>$user->role,
+            // 'abilities'=>$user->abilities()
         ], 201);
     }
 
     public function logout(Request $request) {
         $request->user()->currentAccessToken()->delete;
         return response()->json('Logout Successful.');
+    }
+
+    public function userInfo() {
+        return response()->json(auth()->user());
     }
 }
