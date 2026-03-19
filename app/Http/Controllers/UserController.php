@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use Illuminate\Auth\Events\Validated;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -34,10 +35,10 @@ class UserController extends Controller
         $validated = $request->validate([
             'name'=>'required|string',
             'email'=>'required|email|unique:users,email',
-            'phoneNumber'=>'nullable|string',
+            'phone_number'=>'nullable|string',
             'gender'=>'nullable|string',
             'dob'=>'nullable|string',
-            'gymLocation'=>'nullable|string',
+            'gym_location'=>'nullable|string',
             'role_id'=>'required|integer|exists:roles,id',
         ]);
 
@@ -46,15 +47,15 @@ class UserController extends Controller
         $user->email = $validated['email'];
         $user->password = Hash::make('Qwerty1234');
         $user->role_id = $validated['role_id'];
-        $user->phoneNumber = $validated['phoneNumber'];
+        $user->phoneNumber = $validated['phone_number'];
         $user->gender = $validated['gender'];
         $user->dob = $validated['dob'];
-        $user->gymLocation = $validated['gymLocation'];
+        $user->gymLocation = $validated['gym_location'];
         $user->is_active = true; //to delete later after email verification
 
         $user->save();
 
-        return response()->json(['message' => 'Role Saved Successfully.'], 200);
+        return response()->json(['message' => 'User Saved Successfully.'], 200);
     }
 
     /**
@@ -78,7 +79,30 @@ class UserController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $validated = $request->validate([
+            'name'=>'required|string',
+            'email'=>'required|email',
+            'phone_number'=>'nullable|string',
+            'gender'=>'nullable|string',
+            'dob'=>'nullable|string',
+            'gym_location'=>'nullable|string',
+            'role_id'=>'required|integer|exists:roles,id',
+        ]);
+
+        $user = User::find($id);
+        $user->name = $validated['name'];
+        $user->email = $validated['email'];
+        $user->password = Hash::make('Qwerty1234');
+        $user->role_id = $validated['role_id'];
+        $user->phoneNumber = $validated['phone_number'];
+        $user->gender = $validated['gender'];
+        $user->dob = $validated['dob'];
+        $user->gymLocation = $validated['gym_location'];
+        $user->is_active = true; //to delete later after email verification
+
+        $user->save();
+
+        return response()->json(['message' => 'User Updated Successfully.'], 200);
     }
 
     /**

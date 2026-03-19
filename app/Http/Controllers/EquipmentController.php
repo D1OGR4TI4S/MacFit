@@ -69,7 +69,7 @@ class EquipmentController extends Controller
             'name'=>'required|string',
             'usage'=>'required|string|max:1000',
             'model_no'=>'required|string|unique:equipment,model_no',
-            'value'=>'required|number',
+            'value'=>'required',
             'status'=>'required|string'
         ]);
 

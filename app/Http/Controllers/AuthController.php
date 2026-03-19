@@ -23,30 +23,21 @@ class AuthController extends Controller
             'password'=>'required|string|min:4|max:15',
             'user_image'=>'nullable|string|mimes:jpeg,png,jpg',
             'role_id'=>'required|integer|exists:roles,id',
-            'phoneNumber'=>'required',
+            'phone_number'=>'required', // Change back to phoneNumber
             'dob'=>'required',
             'gender'=>'required',
-            'gymLocation'=>'required|'
+            'gym_location'=>'required' // Change back to gymLocation
         ]);
-
-        if ($request->role_id) {
-            $role_id = $request->role_id;
-        }
-
-        else {
-            $role = Role::where('name', 'User')->first();
-            $role_id = $role->id;
-        }
 
         $user = new User();
         $user->name = $validated['name'];
         $user->email = $validated['email'];
         $user->role_id = $validated['role_id'];
         $user->password = Hash::make($validated['password']);
-        $user->phoneNumber = $validated['phoneNumber'];
+        $user->phoneNumber = $validated['phone_number'];
         $user->gender = $validated['gender'];
         $user->dob = $validated['dob'];
-        $user->gymLocation = $validated['gymLocation'];
+        $user->gymLocation = $validated['gym_location'];
         $user->is_active = true; // To delete later
         
         if ($request->hasFile('user_image')) {
@@ -78,10 +69,7 @@ class AuthController extends Controller
             'message'=>'Login Successful!',
             'token'=>$token,
             'user'=>$user,
-            // 'roles'=>$user->role,
-            // 'abilities'=>$user->abilities()
         ], 201);
-
         }
 
         catch(\Exception $exception){
@@ -133,8 +121,6 @@ class AuthController extends Controller
             'message'=>'Login Successful!',
             'token'=>$token,
             'user'=>$user,
-            // 'roles'=>$user->role,
-            // 'abilities'=>$user->abilities()
         ], 201);
     }
 
