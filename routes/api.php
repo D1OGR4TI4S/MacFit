@@ -81,6 +81,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/getUserCharges', [SubscriptionController::class, 'getUserCharges']);
 
     Route::resource('users', UserController::class);
-    Route::resource('equipments', UserController::class);
-    Route::resource('roles', UserController::class);
+    Route::resource('equipments', EquipmentController::class);
+    Route::resource('roles', RoleController::class);
 });
